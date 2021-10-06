@@ -14,63 +14,6 @@ const generateGrid = (rowCount: number, columnCount: number) => {
   return gridBuilder
 }
 
-const isCellPopulated = (r: number, c: number, grid: any) => {
-  const maxRow = grid.length - 1
-  const maxColumn = grid[0].length - 1
-
-  if (r < 0 || r > maxRow || c < 0 || c > maxColumn) {
-    return false
-  }
-
-  return grid[r][c]['populated']
-}
-
-const shouldKeepPopulatedCellAlive = (row: number, column: number, grid: any) => {
-  let populatedNeighborCount = 0
-
-  const adjacentPoints = [
-    [row - 1, column],  // top
-    [row + 1, column],  // bottom
-    [row, column - 1],  // left
-    [row, column + 1],  // right
-    [row - 1, column - 1],  // top left
-    [row - 1, column + 1],  // top right
-    [row + 1, column - 1],  // bottom left
-    [row + 1, column + 1],  // bottom right
-  ]
-
-  for (let [r, c] of adjacentPoints) {
-    if (isCellPopulated(r, c, grid)) {
-      populatedNeighborCount++
-    }
-  }
-
-  return populatedNeighborCount == 2 || populatedNeighborCount == 3
-}
-
-const shouldPopulateDeadCell = (row: number, column: number, grid: any) => {
-  let populatedNeighborCount = 0
-
-  const adjacentPoints = [
-    [row - 1, column],  // top
-    [row + 1, column],  // bottom
-    [row, column - 1],  // left
-    [row, column + 1],  // right
-    [row - 1, column - 1],  // top left
-    [row - 1, column + 1],  // top right
-    [row + 1, column - 1],  // bottom left
-    [row + 1, column + 1],  // bottom right
-  ]
-
-  for (let [r, c] of adjacentPoints) {
-    if (isCellPopulated(r, c, grid)) {
-      populatedNeighborCount++
-    }
-  }
-
-  return populatedNeighborCount == 3
-} 
-
 function App() {
   const [rowCount, setRowCount] = useState(30)
   const [columnCount, setColumnCount] = useState(30)
@@ -136,8 +79,6 @@ function App() {
       if (populatedNeighborCount === 2 || populatedNeighborCount === 3) {
         updatedCells[key] = { x, y }
       }
-
-      console.log('key:', key)
     }
 
     for (let key in emptyCells) {
@@ -172,24 +113,7 @@ function App() {
       }
     }
     
-    console.log('cells:', cells)
-    console.log('updatedCells:', updatedCells)
-    console.log('emptyCells:', Object.keys(emptyCells).length, emptyCells)
-    
     setCells(updatedCells)
-    // for (let row = 0; row < rowCount; row++) {
-    //   for (let column = 0; column < columnCount; column++) {
-    //     const currentCell = grid[row][column]
-
-    //     if (!currentCell.populated) {
-    //       gridBuilder[row][column]['populated'] = shouldPopulateDeadCell(row, column, grid)
-    //     } else {
-    //       gridBuilder[row][column]['populated'] = shouldKeepPopulatedCellAlive(row, column, grid)
-    //     }
-    //   }
-    // }
-
-    // setGrid(gridBuilder)
   }
   
   return (
