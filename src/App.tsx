@@ -20,6 +20,7 @@ function App() {
   const [grid, setGrid] = useState<any>(null)
   const [cells, setCells] = useState<any>({})
   const [isActive, setIsActive] = useState(false)
+  const [generation, setGeneration] = useState(0)
 
   useEffect(() => {
     let gridBuilder = generateGrid(rowCount, columnCount)
@@ -28,7 +29,7 @@ function App() {
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout
-    
+
     if (isActive) {
       intervalId = setInterval(() => {
         createNextGeneration()
@@ -124,7 +125,14 @@ function App() {
       }
     }
     
+    setGeneration(generation + 1)
     setCells(updatedCells)
+  }
+
+  const clearBoard = () => {
+    setIsActive(false)
+    setCells({})
+    setGeneration(0)
   }
   
   return (
@@ -157,6 +165,13 @@ function App() {
             onClick={() => setIsActive(!isActive)}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >{isActive ? 'Pause' : 'Start'}</button>
+          <button
+            type="button"
+            onClick={() => clearBoard()}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >Reset</button>
+          <span>Generation: {generation}</span>
+          <span>Population: {Object.keys(cells).length}</span>
         </div>
       </div>
     </div>
