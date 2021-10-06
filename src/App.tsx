@@ -22,41 +22,7 @@ function App() {
   const [isActive, setIsActive] = useState(false)
   const [generation, setGeneration] = useState(0)
 
-  useEffect(() => {
-    let gridBuilder = generateGrid(rowCount, columnCount)
-    setGrid(gridBuilder)
-  }, [rowCount, columnCount])
-
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout
-
-    if (isActive) {
-      intervalId = setInterval(() => {
-        createNextGeneration()
-      }, 1000)
-    }
-
-    return () => clearInterval(intervalId)
-  }, [isActive, cells])
-
-  const isCellPopulated = (row: number, column: number) => {
-    var key = `${row}-${column}`
-    return key in cells
-  }
-
-  const toggleCellSelection = (x: number, y: number) => {
-    var key = `${x}-${y}`
-    var cached: any = Object.assign({}, cells)
-
-    if (key in cached) {
-      delete cached[key]
-    } else {
-      cached[key] = { x, y }
-    }
-
-    setCells(cached)
-  }
-
+  
   const createNextGeneration = () => {
     const updatedCells: any = {}
     const emptyCells: any = {}
@@ -127,6 +93,41 @@ function App() {
     
     setGeneration(generation + 1)
     setCells(updatedCells)
+  }
+
+  useEffect(() => {
+    let gridBuilder = generateGrid(rowCount, columnCount)
+    setGrid(gridBuilder)
+  }, [rowCount, columnCount])
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout
+
+    if (isActive) {
+      intervalId = setInterval(() => {
+        createNextGeneration()
+      }, 1000)
+    }
+
+    return () => clearInterval(intervalId)
+  }, [isActive, cells, createNextGeneration])
+
+  const isCellPopulated = (row: number, column: number) => {
+    var key = `${row}-${column}`
+    return key in cells
+  }
+
+  const toggleCellSelection = (x: number, y: number) => {
+    var key = `${x}-${y}`
+    var cached: any = Object.assign({}, cells)
+
+    if (key in cached) {
+      delete cached[key]
+    } else {
+      cached[key] = { x, y }
+    }
+
+    setCells(cached)
   }
 
   const clearBoard = () => {
