@@ -75,45 +75,121 @@ function App() {
   const [rowCount, setRowCount] = useState(30)
   const [columnCount, setColumnCount] = useState(30)
   const [grid, setGrid] = useState<any>(null)
+  const [cells, setCells] = useState<any>({})
 
   useEffect(() => {
     let gridBuilder = generateGrid(rowCount, columnCount)
     setGrid(gridBuilder)
   }, [rowCount, columnCount])
 
-  const toggleCellSelection = (targetRow: number, targetColumn: number) => {
-    let gridBuilder = generateGrid(rowCount, columnCount)
+  const isCellPopulated = (row: number, column: number) => {
+    var key = `${row}-${column}`
+    return key in cells
+  }
 
-    for (let row = 0; row < rowCount; row++) {
-      for (let column = 0; column < columnCount; column++) {
-        gridBuilder[row][column] = grid[row][column]
+  const toggleCellSelection = (x: number, y: number) => {
+    var key = `${x}-${y}`
+    var cached: any = Object.assign({}, cells)
 
-        if (targetRow === row && targetColumn === column) {
-          gridBuilder[row][column]['populated'] = ! gridBuilder[row][column]['populated']
-        }
-      }
+    if (key in cached) {
+      delete cached[key]
+    } else {
+      cached[key] = { x, y }
     }
 
-    setGrid(gridBuilder)
+    setCells(cached)
   }
 
   const createNextGeneration = () => {
-    let gridBuilder = generateGrid(rowCount, columnCount)
+    // let gridBuilder = generateGrid(rowCount, columnCount)
 
-    
-    for (let row = 0; row < rowCount; row++) {
-      for (let column = 0; column < columnCount; column++) {
-        const currentCell = grid[row][column]
+    const updatedCells: any = {}
+    const emptyCells: any = {}
 
-        if (!currentCell.populated) {
-          gridBuilder[row][column]['populated'] = shouldPopulateDeadCell(row, column, grid)
+    for (let key in cells) {
+      const { x, y } = cells[key]
+
+      const neighbors = [
+        { x: x - 1, y: y}, // top
+        { x: x + 1, y: y}, // bottom
+        { x: x, y: y - 1}, // left
+        { x: x, y: y + 1}, // right
+        { x: x - 1, y: y - 1}, // top left
+        { x: x - 1, y: y + 1}, // top right
+        { x: x + 1, y: y - 1}, // bottom left
+        { x: x + 1, y: y + 1}, // bottom right
+      ]
+
+      let populatedNeighborCount = 0
+
+      for (let neighbor of neighbors) {
+        const { x: neighborX, y: neighborY } = neighbor
+        const neighborKey = `${neighborX}-${neighborY}`
+
+        if (neighborKey in cells) {
+          populatedNeighborCount++
         } else {
-          gridBuilder[row][column]['populated'] = shouldKeepPopulatedCellAlive(row, column, grid)
+          emptyCells[neighborKey] = { x: neighborX, y: neighborY }
         }
       }
+
+      if (populatedNeighborCount === 2 || populatedNeighborCount === 3) {
+        updatedCells[key] = { x, y }
+      }
+
+      console.log('key:', key)
     }
 
-    setGrid(gridBuilder)
+    for (let key in emptyCells) {
+      const { x, y } = emptyCells[key]
+
+      const neighbors = [
+        { x: x - 1, y: y}, // top
+        { x: x + 1, y: y}, // bottom
+        { x: x, y: y - 1}, // left
+        { x: x, y: y + 1}, // right
+        { x: x - 1, y: y - 1}, // top left
+        { x: x - 1, y: y + 1}, // top right
+        { x: x + 1, y: y - 1}, // bottom left
+        { x: x + 1, y: y + 1}, // bottom right
+      ]
+
+      let populatedNeighborCount = 0
+
+      for (let neighbor of neighbors) {
+        const { x: neighborX, y: neighborY } = neighbor
+        const neighborKey = `${neighborX}-${neighborY}`
+
+        if (neighborKey in cells) {
+          populatedNeighborCount++
+        } else {
+          emptyCells[neighborKey] = { x: neighborX, y: neighborY }
+        }
+      }
+
+      if (populatedNeighborCount === 3) {
+        updatedCells[key] = { x, y }
+      }
+    }
+    
+    console.log('cells:', cells)
+    console.log('updatedCells:', updatedCells)
+    console.log('emptyCells:', Object.keys(emptyCells).length, emptyCells)
+    
+    setCells(updatedCells)
+    // for (let row = 0; row < rowCount; row++) {
+    //   for (let column = 0; column < columnCount; column++) {
+    //     const currentCell = grid[row][column]
+
+    //     if (!currentCell.populated) {
+    //       gridBuilder[row][column]['populated'] = shouldPopulateDeadCell(row, column, grid)
+    //     } else {
+    //       gridBuilder[row][column]['populated'] = shouldKeepPopulatedCellAlive(row, column, grid)
+    //     }
+    //   }
+    // }
+
+    // setGrid(gridBuilder)
   }
   
   return (
@@ -122,11 +198,11 @@ function App() {
         <div className="table-row-group">
           {grid && grid.map((tableRow: any, rowIdx: number) => (
             <div className="table-row" key={`row-${rowIdx}`}>
-              {tableRow.map((tableCell: any) => (
+              {tableRow.map(({ row, column }: any) => (
                 <div
-                  key={`r${tableCell.row}-c${tableCell.column}`}
-                  onClick={() => toggleCellSelection(tableCell.row, tableCell.column)}
-                  className={`${tableCell.populated ? 'bg-blue-300' : ''} table-cell border-solid border-2 border-light-blue-500 w-8 h-8`}
+                  key={`r${row}-c${column}`}
+                  onClick={() => toggleCellSelection(row, column)}
+                  className={`${isCellPopulated(row, column) ? 'bg-blue-300' : ''} table-cell border-solid border-2 border-light-blue-500 w-8 h-8`}
                 ></div>    
               ))}
             </div>  
