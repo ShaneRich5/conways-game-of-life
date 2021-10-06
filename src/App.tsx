@@ -44,8 +44,6 @@ function App() {
   }
 
   const createNextGeneration = () => {
-    // let gridBuilder = generateGrid(rowCount, columnCount)
-
     const updatedCells: any = {}
     const emptyCells: any = {}
 
