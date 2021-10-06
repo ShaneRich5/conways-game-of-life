@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 const generateGrid = (rowCount: number, columnCount: number) => {
   let gridBuilder: any = []
@@ -23,7 +23,7 @@ function App() {
   const [generation, setGeneration] = useState(0)
 
   
-  const createNextGeneration = () => {
+  const createNextGeneration = useCallback(() => {
     const updatedCells: any = {}
     const emptyCells: any = {}
 
@@ -93,7 +93,7 @@ function App() {
     
     setGeneration(generation + 1)
     setCells(updatedCells)
-  }
+  }, [cells, generation])
 
   useEffect(() => {
     let gridBuilder = generateGrid(rowCount, columnCount)
