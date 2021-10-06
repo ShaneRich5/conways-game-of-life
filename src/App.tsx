@@ -19,11 +19,24 @@ function App() {
   const [columnCount, setColumnCount] = useState(30)
   const [grid, setGrid] = useState<any>(null)
   const [cells, setCells] = useState<any>({})
+  const [isActive, setIsActive] = useState(false)
 
   useEffect(() => {
     let gridBuilder = generateGrid(rowCount, columnCount)
     setGrid(gridBuilder)
   }, [rowCount, columnCount])
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout
+    
+    if (isActive) {
+      intervalId = setInterval(() => {
+        createNextGeneration()
+      }, 1000)
+    }
+
+    return () => clearInterval(intervalId)
+  }, [isActive, cells])
 
   const isCellPopulated = (row: number, column: number) => {
     var key = `${row}-${column}`
@@ -132,13 +145,19 @@ function App() {
         </div>
       </div>
       <div>
-      <div className="m-4">
-        <button
-          type="button"
-          onClick={() => createNextGeneration()}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >Next Generation</button>
-      </div>
+        <div className="m-4 space-x-2">
+          <button
+            type="button"
+            disabled={isActive}
+            onClick={() => createNextGeneration()}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >Next Generation</button>
+          <button
+            type="button"
+            onClick={() => setIsActive(!isActive)}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >{isActive ? 'Pause' : 'Start'}</button>
+        </div>
       </div>
     </div>
   );
