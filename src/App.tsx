@@ -15,8 +15,8 @@ const generateGrid = (rowCount: number, columnCount: number) => {
 }
 
 function App() {
-  const [rowCount, setRowCount] = useState(30)
-  const [columnCount, setColumnCount] = useState(30)
+  const rowCount = 30
+  const columnCount = 30
   const [grid, setGrid] = useState<any>(null)
   const [cells, setCells] = useState<any>({})
   const [isActive, setIsActive] = useState(false)
